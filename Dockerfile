@@ -1,29 +1,20 @@
-# Dockerfile
+FROM --platform=linux/amd64 ruby:3.2.2
+RUN apt-get update -qq && apt-get install -y nodejs default-mysql-client
 
-FROM ruby:3.0.2
+WORKDIR /app
 
-# 環境変数の設定
-ENV LANG C.UTF-8
-ENV TZ Asia/Tokyo
+COPY Gemfile /app/Gemfile
+COPY Gemfile.lock /app/Gemfile.lock
 
-# 依存関係のインストール
-RUN apt-get update -qq && apt-get install -y nodejs default-mysql-client build-essential libmysqlclient-dev
-
-# 作業ディレクトリの設定
-WORKDIR /myapp
-
-# GemfileとGemfile.lockをコピー
-COPY Gemfile /myapp/Gemfile
-COPY Gemfile.lock /myapp/Gemfile.lock
-
-# Gemのインストール
+RUN gem install bundler
 RUN bundle install
 
-# アプリケーションのコードをコピー
-COPY . /myapp
+COPY . /app
 
-# ポート3000を公開
-EXPOSE 3000
+COPY entrypoint.sh /usr/bin/
+RUN chmod +x /usr/bin/entrypoint.sh
+ENTRYPOINT ["entrypoint.sh"]
 
-# アプリケーション起動コマンド
+EXPOSE 3002
+
 CMD ["rails", "server", "-b", "0.0.0.0"]
