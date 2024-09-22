@@ -21,10 +21,14 @@ default: &default
   password: password
   host: db
 ```
-
 アプリを起動
 ```
-docker compose exec backend bash
+docker compose build
+docker compose up
+```
+
+```
+docker compose exec web bash
 rails db:create 
 ```
 ```
